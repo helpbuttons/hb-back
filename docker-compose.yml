@@ -11,6 +11,6 @@ services:
     image: postgis/postgis:13-master
     restart: always
     volumes:
-     - ../db/:/var/lib/mysql:rw
+     - ../db:/var/lib/postgresql/data:rw
     environment:
-     - POSTGRES_PASSWORD=jgda7s8tds78sagda
+     - POSTGRES_PASSWORD=change_me
