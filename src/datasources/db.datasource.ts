@@ -1,7 +1,7 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
-const config = {
+const config_prod = {
   name: 'db',
   connector: 'postgresql',
   url: 'postgres://postgres:change_me@postgres/postgres',
@@ -12,6 +12,14 @@ const config = {
   database: 'postgres'
 };
 
+const config_devel = {
+  name: 'db_devel',
+  connector: 'memory',
+  localStorage: '',
+  file: './data/db.json'
+};
+
+const config = config_devel;
 // Observe application's life cycle to disconnect the datasource when
 // application is stopped. This allows the application to be shut down
 // gracefully. The `stop()` method is inherited from `juggler.DataSource`.
@@ -26,6 +34,7 @@ export class DbDataSource extends juggler.DataSource
     @inject('datasources.config.db', {optional: true})
     dsConfig: object = config,
   ) {
+    console.log(process.env);
     super(dsConfig);
   }
 }
