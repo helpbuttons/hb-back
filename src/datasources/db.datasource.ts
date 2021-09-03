@@ -34,7 +34,6 @@ export class DbDataSource extends juggler.DataSource
     @inject('datasources.config.db', {optional: true})
     dsConfig: object = config,
   ) {
-    console.log(process.env);
     super(dsConfig);
   }
 }

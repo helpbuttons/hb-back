@@ -13,4 +13,10 @@ export class UserRepository extends DefaultCrudRepository<
   ) {
     super(User, dataSource);
   }
+  
+  login(username: string, password: string) {
+    return {
+      'token': '2e0d675df9fc96d2e4ec8a3ebbbf45eca917t8dsab7'
+    };
+  }
 }
