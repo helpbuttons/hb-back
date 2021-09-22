@@ -64,13 +64,9 @@ export class NetworkRepository extends DefaultCrudRepository<
   public isOwner(userId: string, networkId: number){
     
     return this.find({"where": {"id": networkId,"owner": userId}, "fields": {"id": true}}).then((networks) => {
-      console.log(networks);
       if(networks && networks.length > 0) {
         return true;
       }
-      return false;
-    }).catch((err)=> {
-      console.log('Error at network repository checking ownership of a network.... ' + err);
       return false;
     });
   }
