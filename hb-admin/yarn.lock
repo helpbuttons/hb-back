@@ -9517,6 +9517,13 @@ ra-data-lb4@^0.4.0:
   resolved "https://registry.yarnpkg.com/ra-data-lb4/-/ra-data-lb4-0.4.0.tgz#f4fbb197a03dca6519d8633842bee7f9c51849e9"
   integrity sha512-eX6Hg8wxaOIntncEu+0xgp5PPInVC2L2h/cji8FTV3/c6Hg6Ihg3ga0c8OZixgrWtEC2a+nxKGQ5M4luscYUag==
 
+ra-data-simple-rest@^3.18.2:
+  version "3.18.2"
+  resolved "https://registry.yarnpkg.com/ra-data-simple-rest/-/ra-data-simple-rest-3.18.2.tgz#ba5b71b4c9197314a343311809585e07b5f248c2"
+  integrity sha512-QO9w+VXomo1QqCatxINe+WsCp65NtZJPHVF+NVpKES1HudW/3Iory1UFeP2x9wz5//u+CbA7WRNJpt5KtIXLZg==
+  dependencies:
+    query-string "^5.1.1"
+
 ra-i18n-polyglot@^3.18.0:
   version "3.18.0"
   resolved "https://registry.yarnpkg.com/ra-i18n-polyglot/-/ra-i18n-polyglot-3.18.0.tgz#d941d4d8ed2c852942eba89360fc2bf742b5fb25"
