@@ -62,6 +62,17 @@ export class Network extends Entity {
   })
   tags?: string[];
 
+  @property({
+    type: 'string'
+  })
+  owner: string;
+
+  @property({
+    type: 'array',
+    itemType: 'number',
+  })
+  friendNetworks?: number[];
+
   @hasMany(() => Button, {through: {model: () => ButtonsNetwork}})
   buttons: Button[];
 
@@ -70,11 +81,17 @@ export class Network extends Entity {
   templateButtons: TemplateButton[];
 
   @property({
-    type: 'string',
-    default: 'admin'
+    type: 'date',
+    default: () => new Date()
   })
-  role: string;
-
+  created ? : string;
+  
+  @property({
+    type: 'date',
+    default: () => new Date()
+  })
+  modified ? : string;
+  
   // TODO: this will have a list of users blocked in a network
   // blockedUsers?: string[];
 

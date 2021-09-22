@@ -70,8 +70,6 @@ CREATE TABLE public.buttonsnetwork (
 );
 
 
-
-
 --
 -- Name: buttonsnetwork_id_seq; Type: SEQUENCE; Schema: public
 --
@@ -109,10 +107,9 @@ CREATE TABLE public.network (
     geoplace text NOT NULL,
     radius integer,
     tags text,
+    friendnetworks text,
     role text DEFAULT 'admin'::text
 );
-
-
 
 
 --
@@ -396,7 +393,7 @@ ALTER TABLE ONLY public.button
 --
 
 ALTER TABLE ONLY public.buttonsnetwork
-    ADD CONSTRAINT buttonsnetwork_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT buttonsnetwork_pkey PRIMARY KEY (networkid,buttonid);
 
 
 --

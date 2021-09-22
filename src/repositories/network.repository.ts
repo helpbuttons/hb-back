@@ -42,6 +42,37 @@ export class NetworkRepository extends DefaultCrudRepository<
 
     this.buttons = this.createHasManyThroughRepositoryFactoryFor('buttons', buttonRepositoryGetter, buttonsNetworkRepositoryGetter,);
     this.registerInclusionResolver('buttons', this.buttons.inclusionResolver);
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */ 
+    (this.modelClass as any).observe('persist', async (ctx: any) => {
+      ctx.data.modified = new Date();
+    });
+    /* eslint-enable @typescript-eslint/no-explicit-any */ 
+  }
+
+  public findOwnerNetworks(userId: string, networkIds: number[]){
+    
+    return this.find({"where": {"id": {"inq": networkIds},"owner": userId}, "fields": {"id": true}}).then(
+      (networks) => {
+        return networks.map((network) => {
+          return network.id;
+        });
+      }
+    );
+  }
+
+  public isOwner(userId: string, networkId: number){
+    
+    return this.find({"where": {"id": networkId,"owner": userId}, "fields": {"id": true}}).then((networks) => {
+      console.log(networks);
+      if(networks && networks.length > 0) {
+        return true;
+      }
+      return false;
+    }).catch((err)=> {
+      console.log('Error at network repository checking ownership of a network.... ' + err);
+      return false;
+    });
   }
 
   public findForMap(geoPolygon: GeoJSON): Promise<Network[]> {

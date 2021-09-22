@@ -30,5 +30,11 @@ export class TemplateButtonRepository extends DefaultCrudRepository<
 
     this.networks = this.createHasManyThroughRepositoryFactoryFor('networks', networkRepositoryGetter, templateButtonNetworkRepositoryGetter,);
     this.registerInclusionResolver('networks', this.networks.inclusionResolver);
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */ 
+    (this.modelClass as any).observe('persist', async (ctx: any) => {
+      ctx.data.modified = new Date();
+    });
+    /* eslint-enable @typescript-eslint/no-explicit-any */ 
   }
 }

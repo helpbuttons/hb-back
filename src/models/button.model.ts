@@ -39,6 +39,23 @@ export class Button extends Entity {
   })
   geoPlace?: object;
 
+  @property({
+    type: 'date',
+    default: () => new Date()
+  })
+  created ? : string;
+  
+  @property({
+    type: 'date',
+    default: () => new Date()
+  })
+  modified ? : string;
+  
+  @property({
+    type: 'string'
+  })
+  owner: string;
+
   @hasMany(() => Network, {through: {model: () => ButtonsNetwork}})
   networks: Network[];
 

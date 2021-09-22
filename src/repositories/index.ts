@@ -5,3 +5,6 @@ export * from './template-button.repository';
 export * from './template-button-network.repository';
 export * from './role.repository';
 export * from './tag.repository';
+export * from './user-extra.repository';
+export * from './user.repository';
+export * from './user-credentials.repository';
