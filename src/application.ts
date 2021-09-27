@@ -1,5 +1,5 @@
 import {BootMixin} from '@loopback/boot';
-import {ApplicationConfig} from '@loopback/core';
+import {ApplicationConfig, generateUniqueId} from '@loopback/core';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -10,7 +10,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import{FILE_UPLOAD_SERVICE,STORAGE_DIRECTORY} from './keys';
+import{FILE_UPLOAD_SERVICE,MailBindings,STORAGE_DIRECTORY} from './keys';
 import {AuthenticationComponent} from '@loopback/authentication';
 import {
   JWTAuthenticationComponent,
@@ -23,6 +23,8 @@ import {CustomTokenService} from './services/custom-token.service';
 import {TokenServiceBindings, TokenServiceConstants} from './keys';
 import { UserCredentialsRepository, UserRepository } from './repositories';
 import { CustomUserService } from './services/custom-user.service';
+import { MailService } from './services/mail.service';
+import { logger } from './logger';
 
 export {ApplicationConfig};
 
@@ -92,6 +94,8 @@ export class HelpbuttonsBackendApp extends BootMixin(
       UserCredentialsRepository,
     );
 
+    this.bind(MailBindings.SERVICE).toClass(MailService);
+    
     // mount authorization component
     const binding = this.component(AuthorizationComponent);
     // configure authorization component
@@ -106,14 +110,19 @@ export class HelpbuttonsBackendApp extends BootMixin(
   }
 
   protected configureFileUpload(destination?: string) {
-    destination = destination ?? path.join(__dirname, '../.uploads');
+    const uploadsPath = process.env.UPLOADS_PATH ? process.env.UPLOADS_PATH : '../.uploads';
+    logger.info('upload path set to: ' + uploadsPath);
+    destination = uploadsPath;
     this.bind(STORAGE_DIRECTORY).to(destination);
     const multerOptions: multer.Options = {
       storage: multer.diskStorage({
         destination,
         // Use the original file name as is
         filename: (req, file, cb) => {
-          cb(null, file.originalname);
+          file.filename = generateUniqueId()+file.originalname
+          cb(null, generateUniqueId()+file.filename);
+          if (req.file)
+            req.file.filename = file.filename;
         },
       }),
     };
