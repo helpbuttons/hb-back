@@ -5,6 +5,5 @@ export * from './template-button.controller';
 // export * from './admin/role.controller';
 export * from './user.controller';
 export * from './tag.controller';
-export * from './buttons-admin.controller';
-export * from './role.controller';
 export * from './files.controller';
+export * from './admin/';

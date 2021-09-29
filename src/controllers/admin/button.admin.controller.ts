@@ -1,3 +1,4 @@
+import { inject } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -16,17 +17,25 @@ import {
   del,
   requestBody,
   response,
+  visibility,
+  OperationVisibility,
+  RestBindings,
+  Response
 } from '@loopback/rest';
-import {Button} from '../models';
-import {ButtonRepository} from '../repositories';
 
-export class ButtonsAdminController {
+import {Button} from '../../models';
+import {ButtonRepository} from '../../repositories';
+
+// @visibility(OperationVisibility.UNDOCUMENTED)
+
+export class ButtonAdminController {
   constructor(
+    @inject(RestBindings.Http.RESPONSE) private httpResponse: Response,
     @repository(ButtonRepository)
     public buttonRepository : ButtonRepository,
   ) {}
-
-  @post('/buttonsAdmin')
+  
+  @post('/admin/buttons/')
   @response(200, {
     description: 'Button model instance',
     content: {'application/json': {schema: getModelSchemaRef(Button)}},
@@ -47,7 +56,7 @@ export class ButtonsAdminController {
     return this.buttonRepository.create(button);
   }
 
-  @get('/buttonsAdmin/count')
+  @get('/admin/buttons/count')
   @response(200, {
     description: 'Button model count',
     content: {'application/json': {schema: CountSchema}},
@@ -58,7 +67,7 @@ export class ButtonsAdminController {
     return this.buttonRepository.count(where);
   }
 
-  @get('/buttonsAdmin')
+  @get('/admin/buttons')
   @response(200, {
     description: 'Array of Button model instances',
     content: {
@@ -73,10 +82,14 @@ export class ButtonsAdminController {
   async find(
     @param.filter(Button) filter?: Filter<Button>,
   ): Promise<Button[]> {
-    return this.buttonRepository.find(filter);
+    // filter = { ...filter, ...{"fields": {"templateButtonId": false}} };
+    return this.buttonRepository.find(filter).then((buttons) => {
+        this.httpResponse.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');this.httpResponse.setHeader('x-total-count', buttons.length);
+      return buttons;
+    });
   }
 
-  @patch('/buttonsAdmin')
+  @patch('/admin/buttons')
   @response(200, {
     description: 'Button PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -95,7 +108,7 @@ export class ButtonsAdminController {
     return this.buttonRepository.updateAll(button, where);
   }
 
-  @get('/buttonsAdmin/{id}')
+  @get('/admin/buttons/{id}')
   @response(200, {
     description: 'Button model instance',
     content: {
@@ -111,7 +124,7 @@ export class ButtonsAdminController {
     return this.buttonRepository.findById(id, filter);
   }
 
-  @patch('/buttonsAdmin/{id}')
+  @patch('/admin/buttons/{id}')
   @response(204, {
     description: 'Button PATCH success',
   })
@@ -129,7 +142,7 @@ export class ButtonsAdminController {
     await this.buttonRepository.updateById(id, button);
   }
 
-  @put('/buttonsAdmin/{id}')
+  @put('/admin/buttons/{id}')
   @response(204, {
     description: 'Button PUT success',
   })
@@ -140,7 +153,7 @@ export class ButtonsAdminController {
     await this.buttonRepository.replaceById(id, button);
   }
 
-  @del('/buttonsAdmin/{id}')
+  @del('/admin/buttons/{id}')
   @response(204, {
     description: 'Button DELETE success',
   })
@@ -148,3 +161,4 @@ export class ButtonsAdminController {
     await this.buttonRepository.deleteById(id);
   }
 }
+

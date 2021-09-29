@@ -1,4 +1,5 @@
 import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
 import { inject } from '@loopback/core';
 import {
   Count,
@@ -19,14 +20,19 @@ import {
   requestBody,
   response,
   RestBindings,
-  Response
+  Response,
+  visibility,
+  OperationVisibility
 } from '@loopback/rest';
-import {Role} from '../models';
-import {RoleRepository} from '../repositories';
+import {Role} from '../../models';
+import {RoleRepository} from '../../repositories';
+import { onlyAdmin } from '../voters';
 
 @authenticate('jwt')
+@visibility(OperationVisibility.UNDOCUMENTED)
+@authorize({allowedRoles: ["guest", "admin"]})
 
-export class RoleController {
+export class RoleAdminController {
   constructor(
     @inject(RestBindings.Http.RESPONSE) private httpResponse: Response,
     @repository(RoleRepository)
