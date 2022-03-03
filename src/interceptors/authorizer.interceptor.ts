@@ -10,10 +10,18 @@ import {
   NonVoid,
   Provider,
 } from '@loopback/core';
-import { Principal, securityId, SecurityBindings, Role } from '@loopback/security';
+import {
+  Principal,
+  securityId,
+  SecurityBindings,
+  Role,
+} from '@loopback/security';
 import debugFactory from 'debug';
-import { getAuthorizationMetadata } from '@loopback/authorization';
-import { AuthorizationBindings, AuthorizationTags } from '@loopback/authorization';
+import {getAuthorizationMetadata} from '@loopback/authorization';
+import {
+  AuthorizationBindings,
+  AuthorizationTags,
+} from '@loopback/authorization';
 import {
   AuthorizationContext,
   AuthorizationDecision,
@@ -21,7 +29,7 @@ import {
   AuthorizationOptions,
   Authorizer,
 } from '@loopback/authorization';
-import { CustomUserProfile } from '../types';
+import {CustomUserProfile} from '../types';
 
 const debug = debugFactory('loopback:authorization:interceptor');
 
@@ -30,7 +38,7 @@ export class AuthorizationInterceptor implements Provider<Interceptor> {
   private options: AuthorizationOptions;
 
   constructor(
-    @config({ fromBinding: AuthorizationBindings.COMPONENT })
+    @config({fromBinding: AuthorizationBindings.COMPONENT})
     options: AuthorizationOptions = {},
   ) {
     this.options = {
@@ -67,10 +75,13 @@ export class AuthorizationInterceptor implements Provider<Interceptor> {
     debug('Authorization metadata for %s', description, metadata);
 
     // retrieve it from authentication module
-    const user = await invocationCtx.get<CustomUserProfile>(SecurityBindings.USER, {
-      optional: true,
-    });
-    
+    const user = await invocationCtx.get<CustomUserProfile>(
+      SecurityBindings.USER,
+      {
+        optional: true,
+      },
+    );
+
     debug('Current user', user);
 
     const authorizationCtx: AuthorizationContext = {
@@ -80,7 +91,7 @@ export class AuthorizationInterceptor implements Provider<Interceptor> {
       resource: invocationCtx.targetName,
       invocationContext: invocationCtx,
     };
-    
+
     debug('Security context for %s', description, authorizationCtx);
     const authorizers = await loadAuthorizers(
       invocationCtx,
@@ -149,11 +160,11 @@ function createPrincipalFromUserProfile(user: CustomUserProfile): Principal {
     type: 'USER',
   };
 }
-  function createRoles(roles?: string[]): Role[] {
-    if (!roles) {
-      return [];
-    }
-    return roles.map((item) => {
-      return {name: item,    [securityId]: ''};  
-    });
+function createRoles(roles?: string[]): Role[] {
+  if (!roles) {
+    return [];
   }
+  return roles.map(item => {
+    return {name: item, [securityId]: ''};
+  });
+}

@@ -30,7 +30,7 @@ export class CustomTokenService implements TokenService {
       // decode user profile from token
       const decodedToken = await verifyAsync(token, this.jwtSecret);
       // don't copy over  token field 'iat' and 'exp', nor 'email' to user profile
-      
+
       userProfile = Object.assign(
         {[securityId]: '', name: ''},
         {
@@ -59,7 +59,7 @@ export class CustomTokenService implements TokenService {
       name: userProfile.name,
       roles: userProfile.roles,
     };
-    
+
     // Generate a JSON Web Token
     let token: string;
     try {

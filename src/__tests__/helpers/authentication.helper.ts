@@ -1,10 +1,11 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {HelpbuttonsBackendApp} from '../..';
 import {
   createRestAppClient,
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
-import { UserRepository } from '@loopback/authentication-jwt';
+import {UserRepository} from '@loopback/authentication-jwt';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -26,35 +27,37 @@ export async function setupApplication(): Promise<AppWithClient> {
   return {app, client};
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function signup(app: HelpbuttonsBackendApp, client: Client, customSignupData?: any ): Promise<string> {
-  
-  const userRepo : UserRepository = await app.get('repositories.UserRepository');
+export async function signup(
+  app: HelpbuttonsBackendApp,
+  client: Client,
+  customSignupData?: any,
+): Promise<string> {
+  const userRepo: UserRepository = await app.get('repositories.UserRepository');
   await userRepo.deleteAll();
 
   let signupData = {
-    "username": "lala",
-    "realm" : "lala",
-    "email": "testuser2@abc.com",
-    "password": "testuser2"
+    username: 'lala',
+    realm: 'lala',
+    email: 'testuser2@abc.com',
+    password: 'testuser2',
   };
   signupData = {
     ...signupData,
     ...customSignupData,
   };
-  
-  const res = await client
-  .post('/users/signup')
-  .send(signupData);
-  
+
+  const res = await client.post('/users/signup').send(signupData);
+
   // activate account
   await client.get(res.body.verificationToken);
 
-  return res.body.id; 
+  return res.body.id;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function login(client: Client, customUserCredential?: any): Promise<string> {
+export async function login(
+  client: Client,
+  customUserCredential?: any,
+): Promise<string> {
   let userCredential = {
     email: 'testuser2@abc.com',
     password: 'testuser2',
@@ -64,12 +67,9 @@ export async function login(client: Client, customUserCredential?: any): Promise
     ...userCredential,
     ...customUserCredential,
   };
-  const res = await client
-  .post('/users/login')
-  .send(userCredential)
-  
+  const res = await client.post('/users/login').send(userCredential);
+
   return res.body.token;
-  
 }
 
 export interface AppWithClient {

@@ -7,7 +7,7 @@ import {
   Provider,
   ValueOrPromise,
 } from '@loopback/core';
-import { logger } from '../logger';
+import {logger} from '../logger';
 
 /**
  * This class will be bound to the application as an `Interceptor` during
@@ -38,9 +38,9 @@ export class LogInterceptor implements Provider<Interceptor> {
     invocationCtx: InvocationContext,
     next: () => ValueOrPromise<InvocationResult>,
   ) {
-      logger.info(invocationCtx.targetName);
-    
-      const result = await next();
-      return result;
+    logger.info(invocationCtx.targetName);
+
+    const result = await next();
+    return result;
   }
 }

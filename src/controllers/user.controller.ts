@@ -1,13 +1,13 @@
-require('dotenv').config()
+require('dotenv').config();
 
-import { authenticate, UserService } from '@loopback/authentication';
+import {authenticate, UserService} from '@loopback/authentication';
 import {
   Credentials,
   TokenServiceBindings,
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
-import { generateUniqueId, inject } from '@loopback/core';
-import { model, property, repository } from '@loopback/repository';
+import {generateUniqueId, inject} from '@loopback/core';
+import {model, property, repository} from '@loopback/repository';
 import {
   get,
   getModelSchemaRef,
@@ -17,17 +17,21 @@ import {
   requestBody,
   SchemaObject,
 } from '@loopback/rest';
-import { CustomUserProfile } from '../types';
-import { SecurityBindings, securityId } from '@loopback/security';
-import { genSalt, hash } from 'bcryptjs';
+import {CustomUserProfile} from '../types';
+import {SecurityBindings, securityId} from '@loopback/security';
+import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
-import { TagController } from '.';
-import { Network, User } from '../models';
-import { NetworkRepository, UserExtraRepository, UserRepository } from '../repositories';
-import { CustomTokenService } from '../services/custom-token.service';
-import { MailBindings, URI } from '../keys';
-import { MailService } from '../services/mail.service';
-import { logger } from '../logger';
+import {TagController} from '.';
+import {Network, User} from '../models';
+import {
+  NetworkRepository,
+  UserExtraRepository,
+  UserRepository,
+} from '../repositories';
+import {CustomTokenService} from '../services/custom-token.service';
+import {MailBindings, URI} from '../keys';
+import {MailService} from '../services/mail.service';
+import {logger} from '../logger';
 
 @model()
 export class NewUserRequest extends User {
@@ -45,16 +49,15 @@ export class NewUserRequest extends User {
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
   created?: string;
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
   modified?: string;
-
 }
 
 const CredentialsSchema: SchemaObject = {
@@ -76,7 +79,7 @@ export const CredentialsRequestBody = {
   description: 'The input of login function',
   required: true,
   content: {
-    'application/json': { schema: CredentialsSchema },
+    'application/json': {schema: CredentialsSchema},
   },
 };
 
@@ -87,16 +90,17 @@ export class UserController {
     public customTokenService: CustomTokenService,
     @inject(UserServiceBindings.USER_SERVICE)
     public userService: UserService<CustomUserProfile, Credentials>,
-    @inject(SecurityBindings.USER, { optional: true })
+    @inject(SecurityBindings.USER, {optional: true})
     public user: CustomUserProfile,
-    @inject(UserServiceBindings.USER_REPOSITORY) protected userRepository: UserRepository,
+    @inject(UserServiceBindings.USER_REPOSITORY)
+    protected userRepository: UserRepository,
     @repository(UserExtraRepository)
     public userExtraRepository: UserExtraRepository,
     @inject('controllers.TagController')
     public tagController: TagController,
     @repository(NetworkRepository)
-    public networkRepository : NetworkRepository,
-  ) { }
+    public networkRepository: NetworkRepository,
+  ) {}
 
   @post('/users/login', {
     responses: {
@@ -119,18 +123,20 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{ token: string }> {
+  ): Promise<{token: string}> {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
 
     const userProfile = this.userService.convertToUserProfile(user);
 
     if (!user.emailVerified) {
-      throw new HttpErrors.Unauthorized('Please activate your account using the link provided by mail');
+      throw new HttpErrors.Unauthorized(
+        'Please activate your account using the link provided by mail',
+      );
     }
     // create a JSON Web Token based on the user profile
     const token = await this.customTokenService.generateToken(userProfile);
-    return { token };
+    return {token};
   }
 
   @authenticate('jwt')
@@ -187,63 +193,82 @@ export class UserController {
 
     newUserRequest.realm = '';
     newUserRequest.username = newUserRequest.email;
-    newUserRequest.roles = ["registered"];
+    newUserRequest.roles = ['registered'];
     newUserRequest.emailVerified = false;
     newUserRequest.verificationToken = generateUniqueId();
 
     const savedUser = await this.userRepository.create(
-      _.pick(newUserRequest, ['username', 'email', 'realm', 'roles', 'emailVerified', 'verificationToken']),
+      _.pick(newUserRequest, [
+        'username',
+        'email',
+        'realm',
+        'roles',
+        'emailVerified',
+        'verificationToken',
+      ]),
     );
 
-    await this.userRepository.userCredentials(savedUser.id).create({ password: password });
+    await this.userRepository
+      .userCredentials(savedUser.id)
+      .create({password: password});
 
-    await this.userExtraRepository.createForUser(_.pick(newUserRequest, ['interests']), savedUser.id);
+    await this.userExtraRepository.createForUser(
+      _.pick(newUserRequest, ['interests']),
+      savedUser.id,
+    );
 
     if (newUserRequest.interests)
-      await this.tagController.addTags('user', savedUser.id.toString(), newUserRequest.interests);
-    
+      await this.tagController.addTags(
+        'user',
+        savedUser.id.toString(),
+        newUserRequest.interests,
+      );
+
     logger.info(URI);
 
-    await this.userRepository.userCredentials(savedUser.id).create({ password: password });
+    await this.userRepository
+      .userCredentials(savedUser.id)
+      .create({password: password});
 
     const count = await this.userRepository.count();
-    
+
     if (count.count < 2) {
-      let network: Network;
-      network = new Network(
-        {
-          "name": "Perritos en adopcion",
-          "place": "Livorno, Italia",
-          "tags": ["livorno", "queso"],
-          "url": "net/url",
-          "avatar": "image/url.png",
-          "description": "Net for animal rescue",
-          "privacy": "publico",
-          "geoPlace": {
-            "coordinates": [
-              -9.16534423828125,
-              38.755154214849426
-            ], "type": "Point"
-          },
-          "radius": 240,
-          "friendNetworks": [1, 2],
-          "owner": savedUser.id,
-        }
-      );
+      const network: Network = new Network({
+        name: 'Perritos en adopcion',
+        place: 'Livorno, Italia',
+        tags: ['livorno', 'queso'],
+        url: 'net/url',
+        avatar: 'image/url.png',
+        description: 'Net for animal rescue',
+        privacy: 'publico',
+        geoPlace: {
+          coordinates: [-9.16534423828125, 38.755154214849426],
+          type: 'Point',
+        },
+        radius: 240,
+        friendNetworks: [1, 2],
+        owner: savedUser.id,
+      });
       await this.networkRepository.create(network);
-      
     }
-    
+
     // if in the ENV is dev then activate the user automatically
-    if (process.env.ENV === 'dev') 
-    {
-      await this.userRepository.updateById(savedUser.id, { emailVerified: true });
+    if (process.env.ENV === 'dev') {
+      await this.userRepository.updateById(savedUser.id, {
+        emailVerified: true,
+      });
     } else {
-      const activationUrl: string = URI + 'users/activate/' + savedUser.verificationToken;
+      const activationUrl: string =
+        URI + 'users/activate/' + savedUser.verificationToken;
       await this.mailerService.sendNotificationMail({
         to: savedUser.email,
         subject: 'Please verify ur account',
-        content: 'click here: <a href="' + activationUrl + '">' + activationUrl + '</a>',
+        content:
+          'click here: <a href="' +
+          activationUrl +
+          '">' +
+          activationUrl +
+          '</a>',
       });
     }
     return savedUser;
@@ -256,17 +281,21 @@ export class UserController {
   async activate(
     @param.path.string('verificationToken') verificationToken: string,
   ): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { 'verificationToken': verificationToken } });
+    const user = await this.userRepository.findOne({
+      where: {verificationToken: verificationToken},
+    });
     if (user) {
-      return this.userRepository.updateById(user.id, { emailVerified: true }).then(() => {
-        return "ok";
-      });
+      return this.userRepository
+        .updateById(user.id, {emailVerified: true})
+        .then(() => {
+          return 'ok';
+        });
     }
-    return "fail";
+    return 'fail';
   }
-  
+
   protected async isAlreadyTaken(email: string) {
-    const users = await this.userRepository.find({ where: { 'email': email } });
+    const users = await this.userRepository.find({where: {email: email}});
 
     if (users && users.length > 0) {
       throw new HttpErrors.UnprocessableEntity('Email already taken');

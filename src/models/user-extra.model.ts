@@ -16,16 +16,16 @@ export class UserExtra extends Entity {
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  created ? : string;
-  
+  created?: string;
+
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  modified ? : string;
-  
+  modified?: string;
+
   constructor(data?: Partial<UserExtra>) {
     super(data);
   }

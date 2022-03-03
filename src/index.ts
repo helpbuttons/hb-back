@@ -1,12 +1,11 @@
 import './dotenv';
 import {ApplicationConfig, HelpbuttonsBackendApp} from './application';
-import { logger } from './logger';
+import {logger} from './logger';
 
-//procees.cwd() de donde se llama
+// procees.cwd() de donde se llama
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  
   const app = new HelpbuttonsBackendApp(options);
   await app.boot();
   await app.start();

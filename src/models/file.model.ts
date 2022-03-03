@@ -16,9 +16,9 @@ export class File extends Entity {
   filename?: string;
 
   @property({
-    type: 'string'
+    type: 'string',
   })
-  url? : string;
+  url?: string;
 
   @property({
     type: 'string',
@@ -39,7 +39,6 @@ export class File extends Entity {
     type: 'number',
   })
   size?: number;
-
 
   constructor(data?: Partial<File>) {
     super(data);

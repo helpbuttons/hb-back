@@ -30,7 +30,7 @@ export class CustomUserService implements UserService<User, Credentials> {
     const foundUser = await this.userRepository.findOne({
       where: {email: credentials.email},
     });
-    
+
     if (!foundUser) {
       throw new HttpErrors.Unauthorized(invalidCredentialsError);
     }
@@ -64,7 +64,7 @@ export class CustomUserService implements UserService<User, Credentials> {
     };
   }
 
-  //function to find user by id
+  // function to find user by id
   async findUserById(id: string) {
     const userNotfound = 'invalid User';
     const foundUser = await this.userRepository.findOne({

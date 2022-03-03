@@ -1,8 +1,6 @@
-import { authenticate } from '@loopback/authentication';
-import { inject } from '@loopback/core';
-import {
-  repository
-} from '@loopback/repository';
+import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
+import {repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -12,13 +10,13 @@ import {
   Request,
   Response,
   oas,
-  HttpErrors
+  HttpErrors,
 } from '@loopback/rest';
 import path from 'path';
-import { FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY } from '../keys';
+import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {FileRepository} from '../repositories';
-import { getFilesAndFields } from '../services/file-upload.service';
-import { FileUploadHandler } from '../types';
+import {getFilesAndFields} from '../services/file-upload.service';
+import {FileUploadHandler} from '../types';
 
 @authenticate('jwt')
 export class FilesController {
@@ -26,7 +24,7 @@ export class FilesController {
     @inject(FILE_UPLOAD_SERVICE) private fileUploadHandler: FileUploadHandler,
     @inject(STORAGE_DIRECTORY) private storageDirectory: string,
     @repository(FileRepository)
-    public fileRepository : FileRepository,
+    public fileRepository: FileRepository,
   ) {}
 
   @get('/files/{filename}')
@@ -50,7 +48,7 @@ export class FilesController {
     // The resolved file is outside sandbox
     throw new HttpErrors.BadRequest(`Invalid file name: ${fileName}`);
   }
-  
+
   @authenticate('jwt')
   @post('/files/upload', {
     responses: {
@@ -75,17 +73,20 @@ export class FilesController {
         if (err) reject(err);
         else {
           const uploadedFileRaw = getFilesAndFields(request)[0];
-          const uploadedFile: object = { 
-                "filename": uploadedFileRaw.filename,
-                "originalName": uploadedFileRaw.originalname,
-                "encoding": uploadedFileRaw.encoding,
-                "mimetype": uploadedFileRaw.mimetype,
-                "size": uploadedFileRaw.size,
-                "url": '/files/' + uploadedFileRaw.filename,
-              };
-          this.fileRepository.create(uploadedFile).then(() => {
-            return resolve(uploadedFile);
-          }).catch((error) => console.log(error));
+          const uploadedFile: object = {
+            filename: uploadedFileRaw.filename,
+            originalName: uploadedFileRaw.originalname,
+            encoding: uploadedFileRaw.encoding,
+            mimetype: uploadedFileRaw.mimetype,
+            size: uploadedFileRaw.size,
+            url: '/files/' + uploadedFileRaw.filename,
+          };
+          this.fileRepository
+            .create(uploadedFile)
+            .then(() => {
+              return resolve(uploadedFile);
+            })
+            .catch(error => console.log(error));
         }
       });
     });

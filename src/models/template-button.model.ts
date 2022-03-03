@@ -2,7 +2,7 @@ import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Button} from './button.model';
 import {Network} from './network.model';
 import {TemplateButtonsTypes} from './enums';
-import { TemplateButtonNetwork } from './template-button-network.model';
+import {TemplateButtonNetwork} from './template-button-network.model';
 
 @model()
 export class TemplateButton extends Entity {
@@ -23,7 +23,7 @@ export class TemplateButton extends Entity {
     jsonSchema: {
       enum: Object.values(TemplateButtonsTypes),
     },
-    required: true
+    required: true,
   })
   type?: string;
 
@@ -35,21 +35,21 @@ export class TemplateButton extends Entity {
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  created ? : string;
-  
+  created?: string;
+
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  modified ? : string;
-  
+  modified?: string;
+
   @property({
-    type: 'string'
+    type: 'string',
   })
   owner: string;
-  
+
   @hasMany(() => Button)
   buttons: Button[];
 
@@ -65,4 +65,5 @@ export interface TemplateButtonRelations {
   // describe navigational properties here
 }
 
-export type TemplateButtonWithRelations = TemplateButton & TemplateButtonRelations;
+export type TemplateButtonWithRelations = TemplateButton &
+  TemplateButtonRelations;

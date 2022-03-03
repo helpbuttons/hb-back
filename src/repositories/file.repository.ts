@@ -8,9 +8,7 @@ export class FileRepository extends DefaultCrudRepository<
   typeof File.prototype.id,
   FileRelations
 > {
-  constructor(
-    @inject('datasources.db') dataSource: DbDataSource,
-  ) {
+  constructor(@inject('datasources.db') dataSource: DbDataSource) {
     super(File, dataSource);
   }
 }

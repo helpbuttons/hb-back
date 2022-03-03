@@ -1,5 +1,5 @@
-import { RequestHandler } from 'express-serve-static-core';
-import { UserProfile } from '@loopback/security'
+import {RequestHandler} from 'express-serve-static-core';
+import {UserProfile} from '@loopback/security';
 
 export type FileUploadHandler = RequestHandler;
 

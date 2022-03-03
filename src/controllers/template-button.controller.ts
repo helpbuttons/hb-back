@@ -1,8 +1,4 @@
-import {
-  Filter,
-  FilterExcludingWhere,
-  repository,
-} from '@loopback/repository';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -18,22 +14,24 @@ import {TemplateButton} from '../models';
 import {NetworkRepository, TemplateButtonRepository} from '../repositories';
 
 import {UserProfile, SecurityBindings} from '@loopback/security';
-import { authenticate } from '@loopback/authentication';
-import { inject } from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 
 export class TemplateButtonController {
   constructor(
     @repository(TemplateButtonRepository)
-    public templateButtonRepository : TemplateButtonRepository,
+    public templateButtonRepository: TemplateButtonRepository,
     @repository(NetworkRepository)
-    public networkRepository : NetworkRepository,
+    public networkRepository: NetworkRepository,
   ) {}
 
   @authenticate('jwt')
   @post('/template-buttons/new')
   @response(200, {
     description: 'TemplateButton model instance',
-    content: {'application/json': {schema: getModelSchemaRef(TemplateButton)}},
+    content: {
+      'application/json': {schema: getModelSchemaRef(TemplateButton)},
+    },
   })
   async create(
     @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
@@ -52,7 +50,7 @@ export class TemplateButtonController {
     templateButton.owner = currentUserProfile.id;
     return this.templateButtonRepository.create(templateButton);
   }
-/*
+  /*
   @get('/template-buttons/count')
   @response(200, {
     description: 'TemplateButton model count',
@@ -81,7 +79,7 @@ export class TemplateButtonController {
   ): Promise<TemplateButton[]> {
     return this.templateButtonRepository.find(filter);
   }
-/*
+  /*
   @patch('/template-buttons')
   @response(200, {
     description: 'TemplateButton PATCH success count',
@@ -112,7 +110,8 @@ export class TemplateButtonController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(TemplateButton, {exclude: 'where'}) filter?: FilterExcludingWhere<TemplateButton>
+    @param.filter(TemplateButton, {exclude: 'where'})
+    filter?: FilterExcludingWhere<TemplateButton>,
   ): Promise<TemplateButton> {
     return this.templateButtonRepository.findById(id, filter);
   }
@@ -137,7 +136,7 @@ export class TemplateButtonController {
     await this.isOwner(id, currentUserProfile);
     await this.templateButtonRepository.updateById(id, templateButton);
   }
-/*
+  /*
   @put('/template-buttons/{id}')
   @response(204, {
     description: 'TemplateButton PUT success',
@@ -156,7 +155,7 @@ export class TemplateButtonController {
   })
   async deleteById(
     @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
-    @param.path.number('id') id: number
+    @param.path.number('id') id: number,
   ): Promise<void> {
     await this.isOwner(id, currentUserProfile);
     await this.templateButtonRepository.deleteById(id);
@@ -178,22 +177,33 @@ export class TemplateButtonController {
   ): Promise<object> {
     const networkIds: Array<number> = JSON.parse(networks);
 
-    const ownedNetworkIds = await this.networkRepository.findOwnerNetworks(currentUserProfile.id, networkIds);
-    
+    const ownedNetworkIds = await this.networkRepository.findOwnerNetworks(
+      currentUserProfile.id,
+      networkIds,
+    );
+
     return Promise.all(
-      ownedNetworkIds.map((networkId) => {
-        return this.networkRepository.templateButtons(networkId).link(id).then(() => {
-          return 'Added template button ' + id + ' to network ' + networkId;
-        });
-      })
-    )
+      ownedNetworkIds.map(networkId => {
+        return this.networkRepository
+          .templateButtons(networkId)
+          .link(id)
+          .then(() => {
+            return 'Added template button ' + id + ' to network ' + networkId;
+          });
+      }),
+    );
   }
 
-  protected async isOwner(buttonId : number, currentUserProfile: UserProfile){
-    const isOwnerOfButton = await this.templateButtonRepository.isOwner(currentUserProfile.id, buttonId);
+  protected async isOwner(buttonId: number, currentUserProfile: UserProfile) {
+    const isOwnerOfButton = await this.templateButtonRepository.isOwner(
+      currentUserProfile.id,
+      buttonId,
+    );
 
     if (!isOwnerOfButton) {
-      throw new HttpErrors.UnprocessableEntity('You are not the owner of the button');
+      throw new HttpErrors.UnprocessableEntity(
+        'You are not the owner of the button',
+      );
     }
   }
 }

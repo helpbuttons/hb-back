@@ -4,27 +4,32 @@ import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import multer from 'multer'; 
+import multer from 'multer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import{FILE_UPLOAD_SERVICE,MailBindings,STORAGE_DIRECTORY} from './keys';
+import {FILE_UPLOAD_SERVICE, MailBindings, STORAGE_DIRECTORY} from './keys';
 import {AuthenticationComponent} from '@loopback/authentication';
 import {
   JWTAuthenticationComponent,
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
 import {DbDataSource} from './datasources/db.datasource';
-import { AuthorizationComponent, AuthorizationDecision, AuthorizationOptions, AuthorizationTags } from '@loopback/authorization';
-import {AuthorizationProvider} from './providers/authorization.provider'
+import {
+  AuthorizationComponent,
+  AuthorizationDecision,
+  AuthorizationOptions,
+  AuthorizationTags,
+} from '@loopback/authorization';
+import {AuthorizationProvider} from './providers/authorization.provider';
 import {CustomTokenService} from './services/custom-token.service';
 import {TokenServiceBindings, TokenServiceConstants} from './keys';
-import { UserCredentialsRepository, UserRepository } from './repositories';
-import { CustomUserService } from './services/custom-user.service';
-import { MailService } from './services/mail.service';
-import { logger } from './logger';
+import {UserCredentialsRepository, UserRepository} from './repositories';
+import {CustomUserService} from './services/custom-user.service';
+import {MailService} from './services/mail.service';
+import {logger} from './logger';
 
 export {ApplicationConfig};
 
@@ -45,7 +50,7 @@ export class HelpbuttonsBackendApp extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
-    this.configureFileUpload(options.fileStorageDirectory); 
+    this.configureFileUpload(options.fileStorageDirectory);
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -73,7 +78,7 @@ export class HelpbuttonsBackendApp extends BootMixin(
       precedence: AuthorizationDecision.DENY,
       defaultDecision: AuthorizationDecision.DENY,
     };
-    
+
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(
       TokenServiceConstants.TOKEN_SECRET_VALUE,
     );
@@ -86,21 +91,19 @@ export class HelpbuttonsBackendApp extends BootMixin(
     this.bind(UserServiceBindings.USER_SERVICE).toClass(CustomUserService);
 
     // Bind user and credentials repository
-    this.bind(UserServiceBindings.USER_REPOSITORY).toClass(
-      UserRepository,
-    );
+    this.bind(UserServiceBindings.USER_REPOSITORY).toClass(UserRepository);
 
     this.bind(UserServiceBindings.USER_CREDENTIALS_REPOSITORY).toClass(
       UserCredentialsRepository,
     );
 
     this.bind(MailBindings.SERVICE).toClass(MailService);
-    
+
     // mount authorization component
     const binding = this.component(AuthorizationComponent);
     // configure authorization component
     this.configure(binding.key).to(authoptions);
-    
+
     this.bind('authorizationProviders.my-authorizer-provider')
       .toProvider(AuthorizationProvider)
       .tag(AuthorizationTags.AUTHORIZER);
@@ -110,7 +113,9 @@ export class HelpbuttonsBackendApp extends BootMixin(
   }
 
   protected configureFileUpload(destination?: string) {
-    const uploadsPath = process.env.UPLOADS_PATH ? process.env.UPLOADS_PATH : '../.uploads';
+    const uploadsPath = process.env.UPLOADS_PATH
+      ? process.env.UPLOADS_PATH
+      : '../.uploads';
     logger.info('upload path set to: ' + uploadsPath);
     destination = uploadsPath;
     this.bind(STORAGE_DIRECTORY).to(destination);
@@ -119,14 +124,13 @@ export class HelpbuttonsBackendApp extends BootMixin(
         destination,
         // Use the original file name as is
         filename: (req, file, cb) => {
-          file.filename = generateUniqueId()+file.originalname
-          cb(null, generateUniqueId()+file.filename);
-          if (req.file)
-            req.file.filename = file.filename;
+          file.filename = generateUniqueId() + file.originalname;
+          cb(null, generateUniqueId() + file.filename);
+          if (req.file) req.file.filename = file.filename;
         },
       }),
     };
     // Configure the file upload service with multer options
     this.configure(FILE_UPLOAD_SERVICE).to(multerOptions);
-   }
+  }
 }

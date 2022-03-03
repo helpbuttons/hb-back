@@ -1,6 +1,11 @@
-import { AuthorizationContext, AuthorizationDecision, AuthorizationMetadata, Authorizer } from "@loopback/authorization";
-import { Provider } from "@loopback/core";
-import { securityId, UserProfile } from '@loopback/security';
+import {
+  AuthorizationContext,
+  AuthorizationDecision,
+  AuthorizationMetadata,
+  Authorizer,
+} from '@loopback/authorization';
+import {Provider} from '@loopback/core';
+import {securityId, UserProfile} from '@loopback/security';
 import _ from 'lodash';
 
 export class AuthorizationProvider implements Provider<Authorizer> {
@@ -52,18 +57,17 @@ export class AuthorizationProvider implements Provider<Authorizer> {
 
     let currentUser: UserProfile;
     if (context.principals.length > 0) {
-      const user = _.pick(context.principals[0], [
-        'id',
-        'name',
-        'roles',
-      ]);
-      currentUser = { [securityId]: user.id, name: user.name, roles: user.roles };
+      const user = _.pick(context.principals[0], ['id', 'name', 'roles']);
+      currentUser = {
+        [securityId]: user.id,
+        name: user.name,
+        roles: user.roles,
+      };
     } else {
       return AuthorizationDecision.DENY;
     }
 
-    if (currentUser.roles.indexOf('admin'))
-    {
+    if (currentUser.roles.indexOf('admin')) {
       return AuthorizationDecision.ALLOW;
     }
 

@@ -1,7 +1,7 @@
 import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Button} from './button.model';
 import {ButtonsNetwork} from './buttons-network.model';
-import { TemplateButtonNetwork } from './template-button-network.model';
+import {TemplateButtonNetwork} from './template-button-network.model';
 import {TemplateButton} from './template-button.model';
 
 @model()
@@ -63,7 +63,7 @@ export class Network extends Entity {
   tags?: string[];
 
   @property({
-    type: 'string'
+    type: 'string',
   })
   owner: string;
 
@@ -77,21 +77,23 @@ export class Network extends Entity {
   buttons: Button[];
 
   // TODO this should be a relation with roles
-  @hasMany(() => TemplateButton, {through: {model: () => TemplateButtonNetwork}})
+  @hasMany(() => TemplateButton, {
+    through: {model: () => TemplateButtonNetwork},
+  })
   templateButtons: TemplateButton[];
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  created ? : string;
-  
+  created?: string;
+
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  modified ? : string;
-  
+  modified?: string;
+
   // TODO: this will have a list of users blocked in a network
   // blockedUsers?: string[];
 

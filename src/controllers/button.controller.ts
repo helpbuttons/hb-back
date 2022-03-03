@@ -19,12 +19,16 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {Button, Network} from '../models';
-import {ButtonRepository, NetworkRepository, TemplateButtonRepository} from '../repositories';
-import { Validations } from './validations';
+import {
+  ButtonRepository,
+  NetworkRepository,
+  TemplateButtonRepository,
+} from '../repositories';
+import {Validations} from './validations';
 import {UserProfile, SecurityBindings} from '@loopback/security';
 import {authenticate} from '@loopback/authentication';
-import { inject } from '@loopback/core';
-import { TagController } from './tag.controller';
+import {inject} from '@loopback/core';
+import {TagController} from './tag.controller';
 
 export class ButtonController {
   // protected currentUserProfile : UserProfile;
@@ -32,16 +36,15 @@ export class ButtonController {
     // @inject(SecurityBindings.USER)
     // public currentUserProfile: UserProfile,
     @repository(ButtonRepository)
-    public buttonRepository : ButtonRepository,
+    public buttonRepository: ButtonRepository,
     @repository(NetworkRepository)
-    public networkRepository : NetworkRepository,
+    public networkRepository: NetworkRepository,
     @repository(TemplateButtonRepository)
-    public templateButtonRepository : TemplateButtonRepository,
-    @inject('controllers.TagController') 
+    public templateButtonRepository: TemplateButtonRepository,
+    @inject('controllers.TagController')
     public tagController: TagController,
-  ) {
-  }
-  
+  ) {}
+
   @authenticate('jwt')
   @post('/buttons/new/', {
     responses: {
@@ -63,11 +66,14 @@ export class ButtonController {
           }),
         },
       },
-    }) button: Omit<Button, 'id'>,
+    })
+    button: Omit<Button, 'id'>,
   ): Promise<Button> {
-    if (button.geoPlace){
-      if (!Validations.isGeoPoint(button.geoPlace)){
-        throw new HttpErrors.UnprocessableEntity('`geoPlace` is not well formated, please check the documentation at https://geojson.org/');
+    if (button.geoPlace) {
+      if (!Validations.isGeoPoint(button.geoPlace)) {
+        throw new HttpErrors.UnprocessableEntity(
+          '`geoPlace` is not well formated, please check the documentation at https://geojson.org/',
+        );
       }
     }
     button.owner = currentUserProfile.id;
@@ -76,18 +82,22 @@ export class ButtonController {
     }
 
     await this.isOwnerOfNetwork(networkId, currentUserProfile);
-    
-    return this.networkRepository.buttons(networkId).create(button)
-    .then((createdButton) => {
-      if (!createdButton.id || !button.tags) {
-        return createdButton;
-      }
-      return this.tagController.addTags('button',createdButton.id.toString(), button.tags).then(
-        () => { return createdButton; }
-      );
-    });
+
+    return this.networkRepository
+      .buttons(networkId)
+      .create(button)
+      .then(createdButton => {
+        if (!createdButton.id || !button.tags) {
+          return createdButton;
+        }
+        return this.tagController
+          .addTags('button', createdButton.id.toString(), button.tags)
+          .then(() => {
+            return createdButton;
+          });
+      });
   }
-  
+
   @authenticate('jwt')
   @post('/buttons/addToNetworks/{buttonId}', {
     responses: {
@@ -103,22 +113,29 @@ export class ButtonController {
     @param.query.string('networks') networks: string,
   ): Promise<object> {
     const networkIds: Array<number> = JSON.parse(networks);
-    
-    const ownedNetworkIds = await this.networkRepository.findOwnerNetworks(currentUserProfile.id, networkIds);
-    
+
+    const ownedNetworkIds = await this.networkRepository.findOwnerNetworks(
+      currentUserProfile.id,
+      networkIds,
+    );
+
     await this.isOwner(buttonId, currentUserProfile);
-    
+
     return Promise.all(
-      ownedNetworkIds.map((networkId) => {
-            return this.networkRepository.buttons(networkId).link(buttonId).then(() => {
-              return 'Adding button ' + buttonId + ' to network ' + networkId;
-            }).catch((err) => { 
-              // primary key restriction
-            });
+      ownedNetworkIds.map(networkId => {
+        return this.networkRepository
+          .buttons(networkId)
+          .link(buttonId)
+          .then(() => {
+            return 'Adding button ' + buttonId + ' to network ' + networkId;
           })
+          .catch(err => {
+            // primary key restriction
+          });
+      }),
     );
   }
-/*
+  /*
   @get('/buttons/count')
   @response(200, {
     description: 'Button model count',
@@ -142,13 +159,11 @@ export class ButtonController {
       },
     },
   })
-  async find(
-    @param.filter(Button) filter?: Filter<Button>,
-  ): Promise<Button[]> {
+  async find(@param.filter(Button) filter?: Filter<Button>): Promise<Button[]> {
     // where not private
     return this.buttonRepository.find(filter);
   }
-/*
+  /*
   @patch('/buttons')
   @response(200, {
     description: 'Button PATCH success count',
@@ -179,7 +194,8 @@ export class ButtonController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Button, {exclude: 'where'}) filter?: FilterExcludingWhere<Button>
+    @param.filter(Button, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Button>,
   ): Promise<Button> {
     // if not private
     return this.buttonRepository.findById(id, filter);
@@ -205,10 +221,10 @@ export class ButtonController {
     await this.isOwner(id, currentUserProfile);
     await this.buttonRepository.updateById(id, button);
     if (button.tags) {
-      await this.tagController.updateTags('button',id.toString(), button.tags);
+      await this.tagController.updateTags('button', id.toString(), button.tags);
     }
   }
-/*
+  /*
   @put('/buttons/{id}')
   @response(204, {
     description: 'Button PUT success',
@@ -228,24 +244,37 @@ export class ButtonController {
   async deleteById(
     @param.path.number('id') id: number,
     @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
-    ): Promise<void> {
+  ): Promise<void> {
     await this.isOwner(id, currentUserProfile);
     await this.buttonRepository.deleteById(id);
   }
 
-  protected async isOwner(buttonId : number, currentUserProfile: UserProfile){
-    const isOwnerOfButton = await this.buttonRepository.isOwner(currentUserProfile.id, buttonId);
+  protected async isOwner(buttonId: number, currentUserProfile: UserProfile) {
+    const isOwnerOfButton = await this.buttonRepository.isOwner(
+      currentUserProfile.id,
+      buttonId,
+    );
 
     if (!isOwnerOfButton) {
-      throw new HttpErrors.UnprocessableEntity('You are not the owner of the button');
+      throw new HttpErrors.UnprocessableEntity(
+        'You are not the owner of the button',
+      );
     }
   }
 
-  protected async isOwnerOfNetwork(networkId : number,currentUserProfile: UserProfile){
-    const isOwnerOfNetwork = await this.networkRepository.isOwner(currentUserProfile.id, networkId);
+  protected async isOwnerOfNetwork(
+    networkId: number,
+    currentUserProfile: UserProfile,
+  ) {
+    const isOwnerOfNetwork = await this.networkRepository.isOwner(
+      currentUserProfile.id,
+      networkId,
+    );
 
     if (!isOwnerOfNetwork) {
-      throw new HttpErrors.UnprocessableEntity('You are not the owner of the network');
+      throw new HttpErrors.UnprocessableEntity(
+        'You are not the owner of the network',
+      );
     }
   }
 }

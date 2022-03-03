@@ -1,8 +1,4 @@
-import {
-  Filter,
-  FilterExcludingWhere,
-  repository,
-} from '@loopback/repository';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -16,18 +12,18 @@ import {
 } from '@loopback/rest';
 import {Network} from '../models';
 import {NetworkRepository} from '../repositories';
-import { Validations } from './validations';
-import { GeoJSON } from 'geojson';
-import { inject } from '@loopback/core';
-import { TagController } from './tag.controller';
+import {Validations} from './validations';
+import {GeoJSON} from 'geojson';
+import {inject} from '@loopback/core';
+import {TagController} from './tag.controller';
 import {UserProfile, SecurityBindings} from '@loopback/security';
-import { authenticate } from '@loopback/authentication';
+import {authenticate} from '@loopback/authentication';
 
 export class NetworkController {
   constructor(
     @repository(NetworkRepository)
-    public networkRepository : NetworkRepository,
-    @inject('controllers.TagController') 
+    public networkRepository: NetworkRepository,
+    @inject('controllers.TagController')
     public tagController: TagController,
   ) {}
 
@@ -51,21 +47,24 @@ export class NetworkController {
     })
     network: Omit<Network, 'id'>,
   ): Promise<Network> {
-    if (network.geoPlace){
-      if (!Validations.isGeoPoint(network.geoPlace)){
-        throw new HttpErrors.UnprocessableEntity('`geoPlace` is not well formated, please check the documentation at https://geojson.org/');
+    if (network.geoPlace) {
+      if (!Validations.isGeoPoint(network.geoPlace)) {
+        throw new HttpErrors.UnprocessableEntity(
+          '`geoPlace` is not well formated, please check the documentation at https://geojson.org/',
+        );
       }
     }
     network.owner = currentUserProfile.id;
 
-    return this.networkRepository.create(network)
-    .then((createdNetwork) => {
+    return this.networkRepository.create(network).then(createdNetwork => {
       if (!createdNetwork.id || !network.tags) {
         return createdNetwork;
       }
-      return this.tagController.addTags('network',createdNetwork.id.toString(), network.tags).then(() => {
-        return createdNetwork;
-      });
+      return this.tagController
+        .addTags('network', createdNetwork.id.toString(), network.tags)
+        .then(() => {
+          return createdNetwork;
+        });
     });
   }
 
@@ -98,7 +97,8 @@ export class NetworkController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Network, {exclude: 'where'}) filter?: FilterExcludingWhere<Network>
+    @param.filter(Network, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Network>,
   ): Promise<Network> {
     return this.networkRepository.findById(id, filter);
   }
@@ -120,10 +120,14 @@ export class NetworkController {
   ): Promise<void> {
     await this.networkRepository.updateById(id, network);
     if (network.tags) {
-      await this.tagController.updateTags('network',id.toString(), network.tags);
+      await this.tagController.updateTags(
+        'network',
+        id.toString(),
+        network.tags,
+      );
     }
   }
-/*
+  /*
   @put('/networks/{id}')
   @response(204, {
     description: 'Network PUT success',
@@ -164,7 +168,9 @@ export class NetworkController {
       return this.networkRepository.find(filter);
     }
     if (!Validations.isGeoPolygon(geoPolygon)) {
-      throw new HttpErrors.UnprocessableEntity('`geoPlace` is not well formated, should be a GeoPolygon, please check the documentation at https://geojson.org/');
+      throw new HttpErrors.UnprocessableEntity(
+        '`geoPlace` is not well formated, should be a GeoPolygon, please check the documentation at https://geojson.org/',
+      );
     }
     return this.networkRepository.findForMap(geoPolygon);
   }

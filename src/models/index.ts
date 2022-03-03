@@ -7,6 +7,6 @@ export * from './role.model';
 // export * from './user-role.model';
 export * from './tag.model';
 export * from './user-extra.model';
-export * from './user.model'
+export * from './user.model';
 export * from './user-credentials.model';
 export * from './file.model';

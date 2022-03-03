@@ -1,11 +1,10 @@
 import {Getter, inject} from '@loopback/core';
 import {
-  Count,
   DefaultCrudRepository,
   HasOneRepositoryFactory,
   repository,
 } from '@loopback/repository';
-import { DbDataSource } from '../datasources';
+import {DbDataSource} from '../datasources';
 import {User, UserCredentials, UserRelations} from '../models';
 import {UserCredentialsRepository} from './user-credentials.repository';
 
@@ -22,9 +21,7 @@ export class UserRepository extends DefaultCrudRepository<
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('UserCredentialsRepository')
-    protected userCredentialsRepositoryGetter: Getter<
-      UserCredentialsRepository
-    >,
+    protected userCredentialsRepositoryGetter: Getter<UserCredentialsRepository>,
   ) {
     super(User, dataSource);
     this.userCredentials = this.createHasOneRepositoryFactoryFor(
@@ -41,7 +38,7 @@ export class UserRepository extends DefaultCrudRepository<
     userId: typeof User.prototype.id,
   ): Promise<UserCredentials | undefined> {
     try {
-      const userCredentials =  await this.userCredentials(userId).get();
+      const userCredentials = await this.userCredentials(userId).get();
       return userCredentials;
     } catch (err) {
       if (err.code === 'ENTITY_NOT_FOUND') {

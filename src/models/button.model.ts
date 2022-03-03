@@ -41,18 +41,18 @@ export class Button extends Entity {
 
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  created ? : string;
-  
+  created?: string;
+
   @property({
     type: 'date',
-    default: () => new Date()
+    default: () => new Date(),
   })
-  modified ? : string;
-  
+  modified?: string;
+
   @property({
-    type: 'string'
+    type: 'string',
   })
   owner: string;
 

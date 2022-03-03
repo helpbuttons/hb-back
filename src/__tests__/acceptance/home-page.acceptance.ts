@@ -3,8 +3,7 @@ import {HelpbuttonsBackendApp} from '../..';
 import {setupApplication} from '../helpers/authentication.helper';
 
 describe('HomePage', () => {
-  let app: HelpbuttonsBackendApp;
-  let client: Client;
+  let app: HelpbuttonsBackendApp, client: Client;
 
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());

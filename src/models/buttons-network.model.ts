@@ -29,4 +29,5 @@ export interface ButtonsNetworkRelations {
   // describe navigational properties here
 }
 
-export type ButtonsNetworkWithRelations = ButtonsNetwork & ButtonsNetworkRelations;
+export type ButtonsNetworkWithRelations = ButtonsNetwork &
+  ButtonsNetworkRelations;
