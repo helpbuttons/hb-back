@@ -41,5 +41,5 @@ jobs:
          docker-compose up -d db 
       - name: "run the tests"
         run: |
-         yarn test
+         yarn && yarn test
 
