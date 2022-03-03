@@ -17,7 +17,7 @@ services:
     image: postgis/postgis:13-master
     restart: always
     env_file:
-      - .env
+      - env/.env
     container_name: helpbuttons_postgres
     volumes:
      - ./data/postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
