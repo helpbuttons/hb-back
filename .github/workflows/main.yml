@@ -41,6 +41,5 @@ jobs:
          docker-compose up -d db 
       - name: "run the tests"
         run: |
-         yarn
-         yarn build
-         node_modules/.bin/lb-nyc ./node_modules/.bin/mocha ./dist/__tests__/**/*.test.js
+         yarn test
+
