@@ -15,5 +15,6 @@ import { TemplateButton } from './template-button.entity';
   providers: [
     TemplateButtonService
   ],
+  exports: [TemplateButtonService]
 })
 export class TemplateButtonModule {}

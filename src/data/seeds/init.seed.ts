@@ -5,8 +5,9 @@ import { dbIdGenerator } from '@src/shared/helpers/nanoid-generator.helper'
 import { hash } from 'argon2';
 import { UserCredential } from '@src/modules/user-credential/user-credential.entity';
 import { Network } from '@src/modules/network/network.entity';
-import { Button, ButtonType } from '@src/modules/button/button.entity';
+import { Button } from '@src/modules/button/button.entity';
 import { insert } from './utils';
+import { TemplateButton } from '@src/modules/template-button/template-button.entity';
 
 export default class CreateUsers implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
@@ -28,6 +29,17 @@ export default class CreateUsers implements Seeder {
       password: hashedPassword
     });
 
+    const templateButtonTypes = ['need', 'offer', 'exchange'];
+    templateButtonTypes.forEach( async (type) => {
+      await insert(connection, TemplateButton, {
+        slug: type,
+        description: type,
+        formFields: '{}',
+      });
+    })
+    // create template buttons
+    
+
     const networkId = dbIdGenerator();
     await insert(connection, Network, {
       id: networkId,
@@ -44,7 +56,6 @@ export default class CreateUsers implements Seeder {
 
     await insert(connection, Button, {
       id: dbIdGenerator(),
-      type: ButtonType.OFFER,
       description: 'I could visit a lonely person once or twice a week',
       latitude: 38.86,
       longitude: -3.26,
@@ -52,12 +63,13 @@ export default class CreateUsers implements Seeder {
       location: () => `ST_MakePoint(38.86, -3.26)`,
       network: {id: networkId},
       owner: {id: userId},
+      template: {slug: 'need'},
       images: [],
     });
 
     await insert(connection, Button, {
       id: dbIdGenerator(),
-      type: ButtonType.OFFER,
+      template: {slug: 'offer'},
       description: 'I\'m available for calling someone and reduce their loneliness',
       latitude: 38.87,
       longitude: -3.12,
@@ -70,7 +82,7 @@ export default class CreateUsers implements Seeder {
 
     await insert(connection, Button, {
       id: dbIdGenerator(),
-      type: ButtonType.NEED,
+      template: {slug: 'need'},
       description: 'My neighbour has no family and cannot easily walk outside, would need some company',
       latitude: 38.75,
       longitude: -3.33,
@@ -83,7 +95,7 @@ export default class CreateUsers implements Seeder {
 
     await insert(connection, Button, {
       id: dbIdGenerator(),
-      type: ButtonType.EXCHANGE,
+      template: {slug: 'exchange'},
       description: 'I have no family or friends, if you are also alone we could talk',
       latitude: 38.88,
       longitude: -3.19,

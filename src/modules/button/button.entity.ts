@@ -2,20 +2,16 @@ import { BaseEntity } from '@src/shared/types/base.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
 import { FeedButton } from '../feed-button/feed-button.entity';
 import { Network } from '../network/network.entity';
+import { TemplateButton } from '../template-button/template-button.entity';
 import { User } from '../user/user.entity';
 // https://stackoverflow.com/a/67557083
-
-export enum ButtonType {
-  OFFER = 'offer',
-  NEED = 'need',
-  EXCHANGE = 'exchange',
-}
 
 @Entity()
 export class Button extends BaseEntity {
@@ -35,18 +31,15 @@ export class Button extends BaseEntity {
   @Column({ type: 'geometry' })
   location: object;
 
-  @Column({
-    type: 'enum',
-    enum: ButtonType,
-    default: ButtonType.NEED,
-  })
-  type: ButtonType;
-
   @Column('text', { array: true, nullable: true, default: [] })
   tags: string[];
 
   @Column('text', { array: true, nullable: true })
   images: string[];
+
+  @ManyToOne(() => TemplateButton, (templateButton) => templateButton.buttons)
+  @JoinColumn({ name: "type" })
+  template: TemplateButton;
 
   @ManyToOne(() => Network, (network) => network.buttons)
   network: Network;

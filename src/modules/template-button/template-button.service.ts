@@ -18,7 +18,6 @@ export class TemplateButtonService {
       id: dbIdGenerator(),
       name: createDto.name,
       description: createDto.description,
-      type: createDto.type,
       formFields: createDto.formFields
     }
     
@@ -27,21 +26,21 @@ export class TemplateButtonService {
     return templateButton;
   }
 
-  findOne(id: string) {
-    return this.templateButtonRepository.findOne({id});
+  findOne(slug: string) {
+    return this.templateButtonRepository.findOne({slug});
   }
 
-  update(id: string, updateDto: UpdateTemplateButtonDto) {
+  update(slug: string, updateDto: UpdateTemplateButtonDto) {
     let templateButton = {
       ...updateDto,
-      id
+      slug
     }
 
     return this.templateButtonRepository.save([templateButton]);
   }
 
-  remove(id: string) {
-    return this.templateButtonRepository.delete({id});
+  remove(slug: string) {
+    return this.templateButtonRepository.delete({slug});
   }
 }
   
