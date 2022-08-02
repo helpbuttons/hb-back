@@ -44,15 +44,24 @@ export default class CreateUsers implements Seeder {
       avatar: '',
     });
 
-    const templateButtonTypes = ['need', 'offer', 'exchange'];
-    templateButtonTypes.forEach( async (type) => {
-      await insert(connection, TemplateButton, {
-        slug: type,
-        description: type.charAt(0).toUpperCase() + type.slice(1),
-        formFields: '{}',
-        network: {id: networkId}
-      });
-    })
+    await insert(connection, TemplateButton, {
+      slug: "need",
+      description: "Need",
+      formFields: ['description', 'tags'],
+      network: {id: networkId}
+    });
+    await insert(connection, TemplateButton, {
+      slug: "offer",
+      description: "Offer",
+      formFields: ['description', 'tags', 'images', 'when'],
+      network: {id: networkId}
+    });
+    await insert(connection, TemplateButton, {
+      slug: "exchange",
+      description: "Exchange",
+      formFields: ['when'],
+      network: {id: networkId}
+    });
     
     await insert(connection, Button, {
       id: dbIdGenerator(),

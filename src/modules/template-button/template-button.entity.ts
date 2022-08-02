@@ -13,8 +13,8 @@ export class TemplateButton extends BaseEntity{
   @Column({})
   description: string;
 
-  @Column({})
-  formFields: string;
+  @Column('text', { array: true, nullable: true, default: [] })
+  formFields: string[];
 
   @OneToMany(() => Button, (button) => button.template)
   buttons: Button[];
