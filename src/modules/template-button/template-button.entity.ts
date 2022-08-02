@@ -1,6 +1,7 @@
 import { BaseEntity } from '@src/shared/types/base.entity';
-import {  Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn  } from 'typeorm';
+import {  Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn  } from 'typeorm';
 import { Button } from '../button/button.entity';
+import { Network } from '../network/network.entity';
 // https://stackoverflow.com/a/67557083
 
 @Entity()
@@ -17,5 +18,7 @@ export class TemplateButton extends BaseEntity{
 
   @OneToMany(() => Button, (button) => button.template)
   buttons: Button[];
-  //TODO: missing: owner, 
+
+  @ManyToOne(() => Network, (network) => network.templateButtons)
+  network: Network;
 }

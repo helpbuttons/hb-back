@@ -29,16 +29,6 @@ export default class CreateUsers implements Seeder {
       password: hashedPassword
     });
 
-    const templateButtonTypes = ['need', 'offer', 'exchange'];
-    templateButtonTypes.forEach( async (type) => {
-      await insert(connection, TemplateButton, {
-        slug: type,
-        description: type,
-        formFields: '{}',
-      });
-    })
-    // create template buttons
-    
 
     const networkId = dbIdGenerator();
     await insert(connection, Network, {
@@ -54,6 +44,16 @@ export default class CreateUsers implements Seeder {
       avatar: '',
     });
 
+    const templateButtonTypes = ['need', 'offer', 'exchange'];
+    templateButtonTypes.forEach( async (type) => {
+      await insert(connection, TemplateButton, {
+        slug: type,
+        description: type.charAt(0).toUpperCase() + type.slice(1),
+        formFields: '{}',
+        network: {id: networkId}
+      });
+    })
+    
     await insert(connection, Button, {
       id: dbIdGenerator(),
       description: 'I could visit a lonely person once or twice a week',
