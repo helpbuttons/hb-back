@@ -24,10 +24,10 @@ export class TemplateButtonController {
     return this.templateButtonService.create(createDto);
   }
 
-  // @Get('/find/')
-  // async findAll(@Query() filters: FilterTemplateButtonsOrmDto) {
-  //   return await this.templateButtonService.findAll(filters);
-  // }
+  @Get('/find/:networkId')
+  async find(@Param('networkId') networkId: string) {
+    return await this.templateButtonService.find(networkId);
+  }
 
   @Get('findById/:templateButtonId')
   findOne(@Param('templateButtonId') templateButtonId: string) {

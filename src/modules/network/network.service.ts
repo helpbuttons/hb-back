@@ -76,7 +76,7 @@ export class NetworkService {
   }
 
   async findDefaultNetwork(): Promise<Network>{
-    const defaultNetwork = await this.networkRepository.findOne({order: {created_at: "ASC"}});
+    const defaultNetwork = await this.networkRepository.findOne({order: {created_at: "ASC"}, relations: ["templateButtons"]});
     if (!defaultNetwork)
     {
       throw new NotFoundException('Default network not found');

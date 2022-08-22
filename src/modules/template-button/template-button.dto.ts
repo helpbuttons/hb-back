@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TemplateButton, TemplateButtonType } from './template-button.entity';
-import { IsEnum, IsJSON, MinLength } from 'class-validator';
+import { TemplateButton } from './template-button.entity';
+import { IsArray, IsEnum, IsJSON, IsOptional, MinLength } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 // https://github.com/typestack/class-validator
@@ -26,17 +26,12 @@ export class CreateTemplateButtonDto implements Partial<TemplateButton> {
   description: string;
 
   @ApiProperty({
-    type: String,
-    required: true,
+    type: [String],
+    required: false,
   })
-  @IsJSON({})
-  formFields: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsEnum(TemplateButtonType)
-  type: TemplateButtonType;
+  @IsOptional()
+  @IsArray({})
+  formFields: string[];
 
 }
 

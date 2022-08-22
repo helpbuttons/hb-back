@@ -14,6 +14,7 @@ import { getManager } from 'typeorm';
 import { NetworkService } from '../network/network.service';
 import { StorageService } from '../storage/storage.service';
 import { User } from '../user/user.entity';
+import { TemplateButtonService } from '../template-button/template-button.service';
 
 @Injectable()
 export class ButtonService {
@@ -23,6 +24,7 @@ export class ButtonService {
     private readonly tagService: TagService,
     private readonly networkService: NetworkService,
     private readonly storageService: StorageService,
+    private readonly templateButtonService: TemplateButtonService
   ) {}
 
   async create(
@@ -35,14 +37,23 @@ export class ButtonService {
 
     if (!network) {
       throw new HttpException(
-        { message: 'Network not found' },
+        { message: 'network-not-found' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const type = await this.templateButtonService.findOne(createDto.type);
+
+    if (!type) {
+      throw new HttpException(
+        { message: 'type-not-found' },
         HttpStatus.BAD_REQUEST,
       );
     }
 
     const button = {
       id: dbIdGenerator(),
-      type: createDto.type,
+      template: type,
       description: createDto.description,
       latitude: createDto.latitude,
       longitude: createDto.longitude,
@@ -152,8 +163,8 @@ export class ButtonService {
 
       const buttonsIds = buttonsOnBounds.map((button) => button.id);
 
-      return this.buttonRepository.find({
-        relations: ['network', 'feed'],
+      let buttons = await this.buttonRepository.find({
+        relations: ['network', 'feed', 'template'],
         where: {
           id: In(buttonsIds),
         },
@@ -161,6 +172,11 @@ export class ButtonService {
           created_at: 'DESC',
         },
       });
+
+      return buttons.map((button) => {
+        if (button.template != null)
+          return {...button, type: button.template.slug}
+      })
     } catch (err) {
       throw new NotFoundException('no buttons found');
     }

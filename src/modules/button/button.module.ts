@@ -6,6 +6,7 @@ import { Button } from './button.entity';
 import { TagModule } from '../tag/tag.module';
 import { NetworkModule } from '../network/network.module';
 import { StorageModule } from '../storage/storage.module';
+import { TemplateButtonModule } from '../template-button/template-button.module';
 
 
 @Module({
@@ -13,7 +14,8 @@ import { StorageModule } from '../storage/storage.module';
     TypeOrmModule.forFeature([Button]),
     TagModule,
     NetworkModule,
-    StorageModule
+    StorageModule,
+    TemplateButtonModule
   ],
   controllers: [
     ButtonController

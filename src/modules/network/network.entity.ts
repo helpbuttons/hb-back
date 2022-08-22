@@ -1,6 +1,7 @@
 import { BaseEntity } from '@src/shared/types/base.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Button } from '../button/button.entity';
+import { TemplateButton } from '../template-button/template-button.entity';
 
 export enum PrivacyType {
   PUBLIC = 'public',
@@ -49,5 +50,7 @@ export class Network extends BaseEntity {
 
   @OneToMany(() => Button, (button) => button.network)
   buttons: Network[];
-  // missing, templates, buttons, friendNetworks, owner
+
+  @OneToMany(() => TemplateButton, (templateButton) => templateButton.network)
+  templateButtons: Network[];
 }

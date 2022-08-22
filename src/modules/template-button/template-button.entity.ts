@@ -1,34 +1,24 @@
 import { BaseEntity } from '@src/shared/types/base.entity';
-import {  Column, Entity, PrimaryColumn  } from 'typeorm';
+import {  Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn  } from 'typeorm';
+import { Button } from '../button/button.entity';
+import { Network } from '../network/network.entity';
 // https://stackoverflow.com/a/67557083
-
-export enum TemplateButtonType {
-  need = 'need',
-  exchange = 'exchange',
-  offer = 'offer'
-}
 
 @Entity()
 export class TemplateButton extends BaseEntity{
-  
   @Column({})
-  @PrimaryColumn()
-  public id: string;
-  
-  @Column({})
-  name?: string;
+  @PrimaryColumn({})
+  slug: string;
 
   @Column({})
   description: string;
 
-  @Column({
-    type: "enum",
-    enum: TemplateButtonType,
-   })
-  type: TemplateButtonType;
+  @Column('text', { array: true, nullable: true, default: [] })
+  formFields: string[];
 
-  @Column({})
-  formFields: string;
+  @OneToMany(() => Button, (button) => button.template)
+  buttons: Button[];
 
-  //TODO: missing: owner, 
+  @ManyToOne(() => Network, (network) => network.templateButtons)
+  network: Network;
 }
